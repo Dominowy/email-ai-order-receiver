@@ -2,7 +2,7 @@
 
 namespace EAOR.Domain.Orders
 {
-    public class Order : BaseEntity
+    public class Order : Entity
     {
         public string ProductName { get; private set; }
 
@@ -15,7 +15,7 @@ namespace EAOR.Domain.Orders
 
         }
 
-        public Order(Guid id, string productName, int quantity, decimal price) : base(id)
+        public Order(string productName, int quantity, decimal price) : base(Guid.NewGuid())
         {
             ProductName = productName;
             Quantity = quantity;
