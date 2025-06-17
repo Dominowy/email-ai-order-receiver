@@ -2,6 +2,7 @@
 using EAOR.Infrastructure.Settings;
 using MailKit;
 using MailKit.Net.Imap;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -9,17 +10,21 @@ namespace EAOR.Infrastructure.BackgroundServices
 {
 	public class ImapListenerBackgroundService : BackgroundService
 	{
-		private readonly IEmailService _emailService;
-		private readonly IImapSettings _imapSettings;
-		private readonly ILogger<ImapListenerBackgroundService> _logger;
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IImapSettings _imapSettings;
+        private readonly ILogger<ImapListenerBackgroundService> _logger;
 
-		public ImapListenerBackgroundService(IEmailService emailService, ILogger<ImapListenerBackgroundService> logger)
-		{
-			_emailService = emailService;
-			_logger = logger;
-		}
+        public ImapListenerBackgroundService(
+            IServiceScopeFactory scopeFactory,
+            IImapSettings imapSettings,
+            ILogger<ImapListenerBackgroundService> logger)
+        {
+            _scopeFactory = scopeFactory;
+            _imapSettings = imapSettings;
+            _logger = logger;
+        }
 
-		protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("IMAP listener started");
 
@@ -27,20 +32,24 @@ namespace EAOR.Infrastructure.BackgroundServices
 
 			try
 			{
-				await client.ConnectAsync("imap.example.com", 993, true, cancellationToken);
-				await client.AuthenticateAsync("mail@example.com", "password", cancellationToken);
-				_logger.LogInformation("IMAP connection established");
+                await client.ConnectAsync(_imapSettings.Host, _imapSettings.Port, _imapSettings.UseSsl, cancellationToken);
+                await client.AuthenticateAsync(_imapSettings.Username, _imapSettings.Password, cancellationToken);
+
+                _logger.LogInformation("IMAP connection established");
 
 				var inbox = client.Inbox;
 				await inbox.OpenAsync(FolderAccess.ReadOnly, cancellationToken);
 
 				inbox.CountChanged += async (s, e) =>
 				{
-					_logger.LogInformation("New email detected in inbox");
+                    using var scope = _scopeFactory.CreateScope();
+                    var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
+                    _logger.LogInformation("New email detected in inbox");
 
 					try
 					{
-						await _emailService.FetchAndSaveOrdersAsync(client, cancellationToken);
+						await emailService.FetchAndSaveOrdersAsync(client, cancellationToken);
 						_logger.LogInformation("Email processed and saved");
 					}
 					catch (Exception ex)

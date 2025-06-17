@@ -6,7 +6,6 @@ using EAOR.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace EAOR.Infrastructure
 {
@@ -25,12 +24,12 @@ namespace EAOR.Infrastructure
                 dbContext.Database.Migrate();
             }
 
-			services.Configure<ImapSettings>(configuration.GetSection("ImapSettings"));
+            var imapSettings = new ImapSettings();
+            configuration.GetSection("ImapSettings").Bind(imapSettings);
 
-			services.AddSingleton<IImapSettings>(sp =>
-				sp.GetRequiredService<IOptions<ImapSettings>>().Value);
+            services.AddSingleton<IImapSettings>(imapSettings);
 
-			services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IEmailService, EmailService>();
 			services.AddHostedService<ImapListenerBackgroundService>();
 
 			return services;
