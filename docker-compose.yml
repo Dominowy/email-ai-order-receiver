@@ -6,9 +6,9 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db
+      MYSQL_DATABASE: EAOR.Db
       MYSQL_USER: user
-      MYSQL_PASSWORD: mysql
+      MYSQL_PASSWORD: user
     ports:
       - '3306:3306'
     expose:

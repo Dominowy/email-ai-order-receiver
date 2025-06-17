@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EAOR.Domain.Common
+﻿namespace EAOR.Domain.Common
 {
-    public class Entity : IEntity
+    public abstract class Entity
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
+        public DateTime CreatedDate { get; private set; }
 
         protected Entity()
         {
+
         }
 
         protected Entity(Guid id)
         {
             Id = id;
+            CreatedDate = DateTime.UtcNow;
         }
     }
 }
