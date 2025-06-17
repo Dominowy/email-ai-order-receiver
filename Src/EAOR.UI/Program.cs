@@ -1,4 +1,5 @@
 using EAOR.Infrastructure;
+using EAOR.Application;
 using EAOR.UI.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,9 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
 builder.Services.AddInfrastructure(configuration);
+builder.Services.AddApplication(configuration);
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 var app = builder.Build();
 

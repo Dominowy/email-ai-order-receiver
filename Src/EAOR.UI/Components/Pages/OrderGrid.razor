@@ -1,37 +1,41 @@
 ﻿@page "/orders"
-@using EAOR.Domain.Orders
+@using EAOR.Application.Contracts.Services
+@using EAOR.Application.Models
 @using Radzen
 
 <h3>Orders</h3>
 
-<RadzenDataGrid Data="@orders" TItem="Order"
+<RadzenDataGrid Data="@Orders" TItem="OrderDto"
                 AllowSorting="true"
                 AllowPaging="true"
                 PageSize="10"
                 ShowPagingSummary="true"
                 Responsive="true">
     <Columns>
-        <RadzenDataGridColumn TItem="Order" Property="ProductName" Title="Product Name" />
-        <RadzenDataGridColumn TItem="Order" Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn TItem="Order" Property="Price" Title="Price" FormatString="{0:C}" />
+        <RadzenDataGridColumn TItem="OrderDto" Property="ProductName" Title="Product Name" />
+        <RadzenDataGridColumn TItem="OrderDto" Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn TItem="OrderDto" Property="Price" Title="Price" FormatString="{0:C}" />
     </Columns>
 </RadzenDataGrid>
 
 @code {
-    private List<Order> orders;
+    private List<OrderDto> Orders;
+
+    [Inject]
+    private IOrderService OrderService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        orders = await LoadOrdersAsync();
+        Orders = await LoadOrdersAsync();
     }
 
-    private Task<List<Order>> LoadOrdersAsync()
+    private Task<List<OrderDto>> LoadOrdersAsync()
     {
-        return Task.FromResult(new List<Order>
+        return Task.FromResult(new List<OrderDto>
         {
-            new Order("Laptop", 2, 3500.00m),
-            new Order("Mouse", 5, 150.00m ),
-            new Order("Keyboard", 3, 250.00m )
+            new OrderDto { ProductName = "Laptop", Quantity = 2, Price = 3500 },
+            new OrderDto { ProductName = "Mouse", Quantity = 5, Price = 150 },
+            new OrderDto { ProductName = "Keyboard", Quantity = 3, Price = 250 }
         });
     }
 }

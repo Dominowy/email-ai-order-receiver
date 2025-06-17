@@ -13,7 +13,7 @@ namespace EAOR.Domain.Emails
         {
         }
 
-        protected Email(string body, DateTime receivedDate) : base(Guid.NewGuid())
+        public Email(string body, DateTime receivedDate) : base(Guid.NewGuid())
         {
             Body = body;
             ReceivedDate = receivedDate;
