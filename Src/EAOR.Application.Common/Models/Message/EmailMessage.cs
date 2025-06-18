@@ -1,6 +1,6 @@
-﻿namespace EAOR.Application.Common.Models.Dtos
+﻿namespace EAOR.Application.Common.Models.Message
 {
-    public class EmailMessageDto
+    public class EmailMessage
     {
         public string Body { get; set; }
         public DateTime ReceivedDate { get; set; }

@@ -1,5 +1,6 @@
 ﻿using EAOR.Application.Contracts.Infrastructure.Configuration;
 using EAOR.Application.Contracts.Infrastructure.Services;
+using EAOR.Infrastructure.Services.Response;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Text;
@@ -23,31 +24,42 @@ namespace EAOR.Infrastructure.Services
                 new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
         }
 
-        public async Task<string> Get(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
-        {
-            var requestBody = new
-            {
-                model = _settings.Model,
-                messages = new[]
-            {
-                new { role = "system", content = systemPrompt },
-                new { role = "user", content = userPrompt }
-            }
-            };
+		public async Task<string> Get(string systemPrompt, string userPrompt, CancellationToken cancellationToken)
+		{
+			var requestBody = new
+			{
+				model = _settings.Model,
+				messages = new[]
+				{
+					new { role = "system", content = systemPrompt },
+					new { role = "user", content = userPrompt }
+				}
+			};
 
-            var json = JsonSerializer.Serialize(requestBody);
-            using var content = new StringContent(json, Encoding.UTF8, "application/json");
+			var json = JsonSerializer.Serialize(requestBody);
+			using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(_settings.Url, content, cancellationToken);
+			var response = await _httpClient.PostAsync(_settings.Url, content, cancellationToken);
+			var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogError($"API error: {response.StatusCode} - {error}");
-            }
+			if (!response.IsSuccessStatusCode)
+			{
+				_logger.LogError($"API error: {response.StatusCode} - {responseString}");
+				return null;
+			}
 
-            return await response.Content.ReadAsStringAsync(cancellationToken);
-        }
-    }
+			var openAIResponse = JsonSerializer.Deserialize<LlmResponse>(responseString);
+
+			var rawContent = openAIResponse?.choices?[0]?.message?.content;
+
+			if (string.IsNullOrWhiteSpace(rawContent))
+				return null;
+
+			var cleanedJson = System.Text.RegularExpressions.Regex.Replace(rawContent, @"^```json\s*|```$", "", System.Text.RegularExpressions.RegexOptions.Multiline).Trim();
+
+			return cleanedJson;
+		}
+
+	}
 
 }

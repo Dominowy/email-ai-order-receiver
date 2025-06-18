@@ -1,11 +1,13 @@
 ﻿@page "/orders"
-@using EAOR.Application.Contracts.Services
+@using EAOR.Application.Contracts.Application.Services
 @using EAOR.Application.Models
 @using Radzen
 
 <h3>Orders</h3>
 
-<RadzenDataGrid Data="@Orders" TItem="OrderViewModel"
+<input type="text" placeholder="Szukaj produktu..." @bind="searchTerm" class="form-control mb-3" />
+
+<RadzenDataGrid Data="@FilteredOrders" TItem="OrderViewModel"
                 AllowSorting="true"
                 AllowPaging="true"
                 PageSize="10"
@@ -20,22 +22,18 @@
 
 @code {
     private List<OrderViewModel> Orders;
+    private string searchTerm = "";
 
     [Inject]
     private IOrderService OrderService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Orders = await LoadOrdersAsync();
+        Orders = await OrderService.GetOrders();
     }
 
-    private Task<List<OrderViewModel>> LoadOrdersAsync()
-    {
-        return Task.FromResult(new List<OrderViewModel>
-        {
-            new OrderViewModel { ProductName = "Laptop", Quantity = 2, Price = 3500 },
-            new OrderViewModel { ProductName = "Mouse", Quantity = 5, Price = 150 },
-            new OrderViewModel { ProductName = "Keyboard", Quantity = 3, Price = 250 }
-        });
-    }
+    private IEnumerable<OrderViewModel> FilteredOrders =>
+        string.IsNullOrWhiteSpace(searchTerm)
+            ? Orders
+            : Orders.Where(o => o.ProductName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
 }

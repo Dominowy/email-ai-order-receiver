@@ -19,8 +19,6 @@ namespace EAOR.Infrastructure
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            
-
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
@@ -34,13 +32,13 @@ namespace EAOR.Infrastructure
             configuration.GetSection("ImapSettings").Bind(imapSettings);
             services.AddSingleton<IImapSettings>(imapSettings);
 
-            var parserSettings = new LlmSettings();
-            configuration.GetSection("ParserSettings").Bind(parserSettings);
-            services.AddSingleton<ILlmSettings>(parserSettings);
+            var llmSettings = new LlmSettings();
+            configuration.GetSection("LlmSettings").Bind(llmSettings);
+            services.AddSingleton<ILlmSettings>(llmSettings);
 
             services.AddSingleton<IListenerService, ListenerService>();
 
-            services.AddScoped<IEmailProcessingService, EmailProcessingService>();
+            services.AddScoped<IEmailFetchService, EmailFetchService>();
             services.AddScoped<ILlmService, LlmService>();
 
             services.AddHostedService<ImapBackgroundService>();

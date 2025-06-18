@@ -1,11 +1,12 @@
 using EAOR.Infrastructure;
 using EAOR.Application;
 using EAOR.UI.Components;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 // Add services to the container.
-
 var configuration = builder.Configuration;
 
 builder.Services.AddHttpClient();

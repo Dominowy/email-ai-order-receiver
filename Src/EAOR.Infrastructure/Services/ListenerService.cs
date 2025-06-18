@@ -1,8 +1,10 @@
-﻿using EAOR.Application.Contracts.Configuration;
+﻿using EAOR.Application.Common.Models.Events;
+using EAOR.Application.Contracts.Configuration;
 using EAOR.Application.Contracts.Infrastructure.Services;
 using EAOR.Infrastructure.BackgroundServices;
 using MailKit;
 using MailKit.Net.Imap;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -42,15 +44,16 @@ namespace EAOR.Infrastructure.Services
 
                 inbox.CountChanged += async (s, e) =>
                 {
-                    using var scope = _scopeFactory.CreateScope();
-                    var emailService = scope.ServiceProvider.GetRequiredService<IEmailProcessingService>();
+					using var scope = _scopeFactory.CreateScope();
+					var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-                    _logger.LogInformation("New email detected in inbox");
+					_logger.LogInformation("New email detected in inbox");
 
                     try
                     {
-                        await emailService.FetchMail(cancellationToken);
-                        _logger.LogInformation("Email processed and saved");
+						await mediator.Publish(new NewEmailFetchedEvent(), cancellationToken);
+
+						_logger.LogInformation("Email processed and saved");
                     }
                     catch (Exception ex)
                     {

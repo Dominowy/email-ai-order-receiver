@@ -1,5 +1,4 @@
 ﻿using EAOR.Application.Contracts.Application.Services;
-using EAOR.Application.Contracts.Services;
 using EAOR.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,7 @@ namespace EAOR.Application
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddScoped<IOrderService, OrderService>();
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IEmailProccessingService, EmailProccessingService>();
 
             return services;
 		}
