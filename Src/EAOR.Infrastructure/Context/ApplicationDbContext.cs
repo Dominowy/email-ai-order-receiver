@@ -1,4 +1,4 @@
-﻿using EAOR.Application.Contracts.Context;
+﻿using EAOR.Application.Contracts.Infrastructure.Context;
 using EAOR.Domain.Emails;
 using EAOR.Domain.Orders;
 using Microsoft.EntityFrameworkCore;

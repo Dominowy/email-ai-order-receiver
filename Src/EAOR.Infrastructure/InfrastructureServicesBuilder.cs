@@ -1,5 +1,12 @@
-﻿using EAOR.Application.Contracts.Context;
+﻿using EAOR.Application.Contracts.Configuration;
+using EAOR.Application.Contracts.Infrastructure.Configuration;
+using EAOR.Application.Contracts.Infrastructure.Context;
+using EAOR.Application.Contracts.Infrastructure.Services;
+using EAOR.Infrastructure.BackgroundServices;
+using EAOR.Infrastructure.Configuration;
 using EAOR.Infrastructure.Context;
+using EAOR.Infrastructure.Services;
+using EAOR.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +28,22 @@ namespace EAOR.Infrastructure
                 dbContext.Database.Migrate();
             }
 
-            return services;
+            var imapSettings = new ImapSettings();
+            configuration.GetSection("ImapSettings").Bind(imapSettings);
+            services.AddSingleton<IImapSettings>(imapSettings);
+
+            var llmSettings = new LlmSettings();
+            configuration.GetSection("LlmSettings").Bind(llmSettings);
+            services.AddSingleton<ILlmSettings>(llmSettings);
+
+            services.AddSingleton<IListenerService, ListenerService>();
+
+            services.AddScoped<IEmailFetchService, EmailFetchService>();
+            services.AddScoped<ILlmService, LlmService>();
+
+            services.AddHostedService<ImapBackgroundService>();
+
+			return services;
         }
     }
 }

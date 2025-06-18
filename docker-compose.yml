@@ -1,6 +1,6 @@
-version: '3.9'
 services:
-  db:
+  mysql-db:
+    container_name: mysql-db-container
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -9,9 +9,19 @@ services:
       MYSQL_PASSWORD: user
     ports:
       - '3306:3306'
-    expose:
-      - '3306'
     volumes:
       - my-db:/var/lib/mysql
+
+  eaor-ui:
+    container_name: eaor-ui-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mysql-db
+    restart: on-failure
+    
 volumes:
   my-db:

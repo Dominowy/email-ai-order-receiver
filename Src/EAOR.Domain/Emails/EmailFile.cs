@@ -4,8 +4,6 @@ namespace EAOR.Domain.Emails
 {
     public class EmailFile : Entity
     {
-        public string FileName { get; private set; }
-
         public byte[] Data { get; private set; }
 
         public Guid EmailId { get; private set; }
@@ -16,9 +14,8 @@ namespace EAOR.Domain.Emails
 
         }
 
-        public EmailFile(string fileName, string contentType, byte[] data, Guid emailId) : base(Guid.NewGuid())
+        public EmailFile(byte[] data, Guid emailId) : base(Guid.NewGuid())
         {
-            FileName = fileName;
             Data = data;
             EmailId = emailId;
         }

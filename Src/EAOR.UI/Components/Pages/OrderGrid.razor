@@ -1,37 +1,32 @@
 ﻿@page "/orders"
-@using EAOR.Domain.Orders
+@using EAOR.Application.Contracts.Application.Services
+@using EAOR.Application.Models
 @using Radzen
 
 <h3>Orders</h3>
 
-<RadzenDataGrid Data="@orders" TItem="Order"
+<RadzenDataGrid Data="@Orders" TItem="OrderViewModel"
                 AllowSorting="true"
                 AllowPaging="true"
                 PageSize="10"
                 ShowPagingSummary="true"
                 Responsive="true">
     <Columns>
-        <RadzenDataGridColumn TItem="Order" Property="ProductName" Title="Product Name" />
-        <RadzenDataGridColumn TItem="Order" Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn TItem="Order" Property="Price" Title="Price" FormatString="{0:C}" />
+        <RadzenDataGridColumn TItem="OrderViewModel" Property="ProductName" Title="Product Name" />
+        <RadzenDataGridColumn TItem="OrderViewModel" Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn TItem="OrderViewModel" Property="Price" Title="Price" FormatString="{0:C}" />
     </Columns>
 </RadzenDataGrid>
 
 @code {
-    private List<Order> orders;
+    private List<OrderViewModel> Orders;
+    private string searchTerm = "";
+
+    [Inject]
+    private IOrderService OrderService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        orders = await LoadOrdersAsync();
-    }
-
-    private Task<List<Order>> LoadOrdersAsync()
-    {
-        return Task.FromResult(new List<Order>
-        {
-            new Order("Laptop", 2, 3500.00m),
-            new Order("Mouse", 5, 150.00m ),
-            new Order("Keyboard", 3, 250.00m )
-        });
+        Orders = await OrderService.GetOrders();
     }
 }
