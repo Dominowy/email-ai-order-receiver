@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 
-namespace EAOR.Application.Contracts.Context
+using Microsoft.EntityFrameworkCore;
+
+namespace EAOR.Application.Contracts.Infrastructure.Context
 {
     public interface IApplicationDbContext
     {

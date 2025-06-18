@@ -4,6 +4,6 @@ namespace EAOR.Application.Contracts.Services
 {
 	public interface IOrderService
 	{
-		Task<List<OrderDto>> GetOrdersAsync(CancellationToken cancellationToken);
+		Task<List<OrderViewModel>> GetOrders(CancellationToken cancellationToken);
 	}
 }

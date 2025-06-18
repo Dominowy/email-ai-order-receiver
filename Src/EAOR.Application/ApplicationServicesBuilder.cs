@@ -1,7 +1,9 @@
-﻿using EAOR.Application.Contracts.Services;
+﻿using EAOR.Application.Contracts.Application.Services;
+using EAOR.Application.Contracts.Services;
 using EAOR.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace EAOR.Application
 {
@@ -9,9 +11,12 @@ namespace EAOR.Application
 	{
 		public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
 		{
-			services.AddScoped<IOrderService, OrderService>();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-			return services;
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IEmailService, EmailService>();
+
+            return services;
 		}
 	}
 }

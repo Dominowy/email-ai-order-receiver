@@ -1,5 +1,9 @@
-﻿using EAOR.Application.Contracts.Context;
+﻿using EAOR.Application.Contracts.Configuration;
+using EAOR.Application.Contracts.Infrastructure.Configuration;
+using EAOR.Application.Contracts.Infrastructure.Context;
+using EAOR.Application.Contracts.Infrastructure.Services;
 using EAOR.Infrastructure.BackgroundServices;
+using EAOR.Infrastructure.Configuration;
 using EAOR.Infrastructure.Context;
 using EAOR.Infrastructure.Services;
 using EAOR.Infrastructure.Settings;
@@ -15,6 +19,8 @@ namespace EAOR.Infrastructure
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+            
+
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
@@ -26,11 +32,18 @@ namespace EAOR.Infrastructure
 
             var imapSettings = new ImapSettings();
             configuration.GetSection("ImapSettings").Bind(imapSettings);
-
             services.AddSingleton<IImapSettings>(imapSettings);
 
-            services.AddScoped<IEmailService, EmailService>();
-			services.AddHostedService<ImapListenerBackgroundService>();
+            var parserSettings = new LlmSettings();
+            configuration.GetSection("ParserSettings").Bind(parserSettings);
+            services.AddSingleton<ILlmSettings>(parserSettings);
+
+            services.AddSingleton<IListenerService, ListenerService>();
+
+            services.AddScoped<IEmailProcessingService, EmailProcessingService>();
+            services.AddScoped<ILlmService, LlmService>();
+
+            services.AddHostedService<ImapBackgroundService>();
 
 			return services;
         }

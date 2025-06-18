@@ -2,7 +2,7 @@
 
 namespace EAOR.Application.Models
 {
-	public class OrderDto
+	public class OrderViewModel
 	{
 		public string ProductName { get; set; }
 
@@ -10,9 +10,9 @@ namespace EAOR.Application.Models
 
 		public decimal Price { get; set; }
 
-		public static OrderDto Map(Order order)
+		public static OrderViewModel Map(Order order)
 		{
-			return new OrderDto
+			return new OrderViewModel
 			{
 				ProductName = order.ProductName,
 				Quantity = order.Quantity,
