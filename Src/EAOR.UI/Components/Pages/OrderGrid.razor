@@ -5,9 +5,7 @@
 
 <h3>Orders</h3>
 
-<input type="text" placeholder="Szukaj produktu..." @bind="searchTerm" class="form-control mb-3" />
-
-<RadzenDataGrid Data="@FilteredOrders" TItem="OrderViewModel"
+<RadzenDataGrid Data="@Orders" TItem="OrderViewModel"
                 AllowSorting="true"
                 AllowPaging="true"
                 PageSize="10"
@@ -31,9 +29,4 @@
     {
         Orders = await OrderService.GetOrders();
     }
-
-    private IEnumerable<OrderViewModel> FilteredOrders =>
-        string.IsNullOrWhiteSpace(searchTerm)
-            ? Orders
-            : Orders.Where(o => o.ProductName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
 }
